@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>谁是卧底</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .button-group {
+            margin-top: 20px;
+        }
+        .game-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        .word-display {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .player-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .player-list li {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            text-align: center;
+            width: 120px;
+            background-color: #f9f9f9;
+        }
+        .player-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            background-size: cover;
+            background-position: center;
+        }
+        .host-controls {
+            background-color: #f0f8ff;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>谁是卧底</h1>
+        
+        <!-- 房间创建/加入 -->
+        <div id="room-section">
+            <div class="form-group">
+                <label for="room-code">房间代码</label>
+                <input type="text" id="room-code" placeholder="输入房间代码加入，留空创建新房间">
+            </div>
+            <div class="form-group">
+                <label for="player-name">玩家名称</label>
+                <input type="text" id="player-name" placeholder="输入你的名字">
+            </div>
+            <div class="button-group">
+                <button id="join-button">加入/创建房间</button>
+                <button id="clear-storage" style="background-color: #f44336;">清除缓存</button>
+            </div>
+        </div>
+        
+        <!-- 游戏准备 -->
+        <div id="game-prep-section" class="hidden">
+            <h2>游戏准备</h2>
+            <div class="form-group">
+                <label for="player-count">玩家人数</label>
+                <select id="player-count">
+                    <option value="4">4人</option>
+                    <option value="5">5人</option>
+                    <option value="6">6人</option>
+                    <option value="7">7人</option>
+                    <option value="8">8人</option>
+                    <option value="9">9人</option>
+                    <option value="10">10人</option>
+                </select>
+            </div>
+            
+            <div class="game-section">
+                <h3>房间成员</h3>
+                <div class="player-list" id="room-player-list">
+                    <!-- 房间成员将在这里动态生成 -->
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button id="start-game">开始游戏</button>
+            </div>
+        </div>
+        
+        <!-- 游戏界面 -->
+        <div id="game-section" class="hidden">
+            <h2>游戏中</h2>
+            <div class="word-display" id="word-display">
+                你的词：<span id="player-word">加载中...</span>
+            </div>
+            <div class="host-controls" id="host-controls" class="hidden">
+                <h3>房主控制</h3>
+                <p>点击玩家头像查看词语和身份</p>
+                <button id="change-word">更换词语</button>
+            </div>
+            <div class="player-list" id="player-list">
+                <!-- 玩家列表将在这里动态生成 -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- QR Code Generator -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
