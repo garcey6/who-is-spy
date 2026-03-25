@@ -49,12 +49,17 @@ function generateQRCode() {
     }, function (error) {
         if (error) console.error(error);
     });
+    
+    // 打印分享URL到控制台，方便调试
+    console.log('分享URL:', shareUrl);
 }
 
 // 从URL获取房间代码
 function getRoomCodeFromUrl() {
     const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('room');
+    const roomCode = urlParams.get('room');
+    console.log('从URL获取到的房间代码:', roomCode);
+    return roomCode;
 }
 
 // 游戏状态管理
@@ -617,6 +622,7 @@ function init() {
             generateQRCode();
         } else {
             // 加入房间
+            console.log('尝试加入房间，房间代码:', roomCode, '玩家名称:', playerName);
             gameState.roomCode = roomCode;
             gameState.playerName = playerName;
             gameState.isHost = false;
@@ -625,6 +631,7 @@ function init() {
             // 这里只是模拟加入
             // 确保头像不重复
             const availableAvatars = [...gameState.avatars];
+            console.log('可用头像:', availableAvatars);
             
             // 模拟从服务器获取房间信息
             // 实际项目中，这里应该从Firebase或其他服务器获取真实的玩家列表
@@ -634,12 +641,17 @@ function init() {
             
             // 添加新玩家到列表
             gameState.players = [mockHost, newPlayer];
+            console.log('玩家列表:', gameState.players);
             
             saveGameState();
+            console.log('游戏状态已保存');
             showSection('game-section');
+            console.log('已显示游戏界面');
             updatePlayerList();
+            console.log('已更新玩家列表');
             // 模拟获取词语
             document.getElementById('player-word').textContent = '苹果';
+            console.log('已设置玩家词语');
         }
     });
     
