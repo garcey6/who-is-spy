@@ -587,10 +587,17 @@ function loadGameState() {
             console.log('加载房间状态:', loadedState);
             console.log('当前玩家词语:', loadedState.playerWords);
             console.log('当前词语对:', loadedState.currentWords);
+            // 保存当前玩家名称
+            const currentPlayerName = gameState.playerName;
+            const currentIsHost = gameState.isHost;
             // 保留预设词库和头像列表
             loadedState.wordPairs = gameState.wordPairs;
             loadedState.avatars = gameState.avatars;
             Object.assign(gameState, loadedState);
+            // 恢复当前玩家名称和身份
+            gameState.playerName = currentPlayerName;
+            gameState.isHost = currentIsHost;
+            console.log('恢复玩家名称:', gameState.playerName, '是否是房主:', gameState.isHost);
         }
     }
 }
