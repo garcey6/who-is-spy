@@ -80,18 +80,22 @@
             border: 1px solid #ddd;
             border-radius: 10px;
             text-align: center;
-            width: calc(25% - 12px);
-            min-width: 80px;
+            width: 120px;
             background-color: #f9f9f9;
         }
         @media (max-width: 768px) {
             .player-list li {
-                width: calc(33.33% - 10px);
+                width: 100px;
             }
         }
         @media (max-width: 480px) {
+            .player-list {
+                flex-wrap: wrap !important;
+                flex-direction: row !important;
+            }
             .player-list li {
-                width: calc(50% - 7.5px);
+                width: calc(50% - 10px);
+                max-width: 100px;
             }
         }
         .player-avatar {
@@ -173,7 +177,7 @@
             <div class="word-display" id="word-display">
                 你的词：<span id="player-word">加载中...</span>
             </div>
-            <div class="host-controls" id="host-controls" class="hidden">
+            <div class="host-controls hidden" id="host-controls">
                 <h3>房主控制</h3>
                 <p>点击玩家头像查看词语和身份</p>
                 <button id="change-word">更换词语</button>
