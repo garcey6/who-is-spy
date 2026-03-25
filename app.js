@@ -695,22 +695,41 @@ function init() {
     
     // 更换词语按钮
     document.getElementById('change-word').addEventListener('click', () => {
+        console.log('更换词语按钮被点击');
+        console.log('词库长度:', gameState.wordPairs.length);
+        console.log('当前玩家词语:', gameState.playerWords);
+        
         if (gameState.wordPairs.length > 0) {
             const randomIndex = Math.floor(Math.random() * gameState.wordPairs.length);
             gameState.currentWords = gameState.wordPairs[randomIndex];
+            console.log('新词语对:', gameState.currentWords);
             
             // 重新分配词语
             const playerCount = Object.keys(gameState.playerWords).length;
-            const spyIndex = Math.floor(Math.random() * playerCount);
-            let i = 0;
-            for (const playerName in gameState.playerWords) {
-                gameState.playerWords[playerName] = i === spyIndex ? gameState.currentWords.spy : gameState.currentWords.normal;
-                i++;
-            }
+            console.log('玩家数量:', playerCount);
             
-            saveGameState();
-            document.getElementById('player-word').textContent = gameState.playerWords[gameState.playerName];
-            alert('词语已更换');
+            if (playerCount > 0) {
+                const spyIndex = Math.floor(Math.random() * playerCount);
+                console.log('卧底索引:', spyIndex);
+                
+                let i = 0;
+                for (const playerName in gameState.playerWords) {
+                    gameState.playerWords[playerName] = i === spyIndex ? gameState.currentWords.spy : gameState.currentWords.normal;
+                    console.log(`${playerName}的新词语:`, gameState.playerWords[playerName]);
+                    i++;
+                }
+                
+                saveGameState();
+                document.getElementById('player-word').textContent = gameState.playerWords[gameState.playerName];
+                console.log('房主新词语:', gameState.playerWords[gameState.playerName]);
+                alert('词语已更换');
+            } else {
+                console.log('没有玩家，无法分配词语');
+                alert('没有玩家，无法更换词语');
+            }
+        } else {
+            console.log('词库为空');
+            alert('词库为空，无法更换词语');
         }
     });
 }
