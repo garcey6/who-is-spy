@@ -605,6 +605,12 @@ function startPolling() {
         if (gameState.roomCode) {
             loadGameState();
             if (gameState.gameStarted) {
+                // 检查当前是否在准备界面，如果是则跳转到游戏界面
+                const gamePrepSection = document.getElementById('game-prep-section');
+                if (gamePrepSection && !gamePrepSection.classList.contains('hidden')) {
+                    showSection('game-section');
+                    console.log('游戏已开始，自动跳转到游戏界面');
+                }
                 updatePlayerList();
                 const playerWordElement = document.getElementById('player-word');
                 if (playerWordElement && gameState.playerWords[gameState.playerName]) {
@@ -681,6 +687,8 @@ function init() {
             showSection('game-prep-section');
             updateRoomPlayerList();
             generateShareInfo();
+            // 显示开始游戏按钮
+            document.getElementById('start-game-container').classList.remove('hidden');
         } else {
             // 加入房间
             console.log('尝试加入房间，房间代码:', roomCode, '玩家名称:', playerName);
@@ -734,6 +742,8 @@ function init() {
                 console.log('已显示游戏准备界面');
                 updateRoomPlayerList();
                 console.log('已更新玩家列表');
+                // 隐藏开始游戏按钮
+                document.getElementById('start-game-container').classList.add('hidden');
             }
         }
     });
