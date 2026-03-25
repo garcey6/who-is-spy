@@ -898,7 +898,8 @@ function updateRoomPlayerList() {
         avatarDiv.style.backgroundImage = `url(${player.avatar})`;
         li.appendChild(avatarDiv);
         const nameSpan = document.createElement('div');
-        nameSpan.textContent = player.name + (player.isHost ? ' (房主)' : '');
+        const isCurrentPlayer = player.name === gameState.playerName;
+        nameSpan.textContent = (isCurrentPlayer ? '我 ' : '') + player.name + (player.isHost ? ' (房主)' : '');
         li.appendChild(nameSpan);
         playerList.appendChild(li);
     });
@@ -915,7 +916,8 @@ function updatePlayerList() {
             const player = gameState.players[index];
             const nameSpan = li.querySelector('div:last-child');
             if (nameSpan) {
-                nameSpan.textContent = player.name + (player.isHost ? ' (房主)' : '');
+                const isCurrentPlayer = player.name === gameState.playerName;
+                nameSpan.textContent = (isCurrentPlayer ? '我 ' : '') + player.name + (player.isHost ? ' (房主)' : '');
             }
         });
         return;
@@ -943,7 +945,8 @@ function updatePlayerList() {
         
         li.appendChild(avatarDiv);
         const nameSpan = document.createElement('div');
-        nameSpan.textContent = player.name + (player.isHost ? ' (房主)' : '');
+        const isCurrentPlayer = player.name === gameState.playerName;
+        nameSpan.textContent = (isCurrentPlayer ? '我 ' : '') + player.name + (player.isHost ? ' (房主)' : '');
         li.appendChild(nameSpan);
         playerList.appendChild(li);
     });
