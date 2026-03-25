@@ -1,54 +1,76 @@
-// 二维码分享功能
-function generateQRCode() {
+// 房间分享功能 - 不使用二维码，加快加载速度
+function generateShareInfo() {
     if (!gameState.roomCode) return;
     
-    // 获取本地IP地址 - 使用window.location.hostname
-    const ipAddress = window.location.hostname;
-    const port = window.location.port || '8000';
-    const shareUrl = `http://${ipAddress}:${port}?room=${gameState.roomCode}`;
+    // 获取当前URL
+    const currentUrl = window.location.origin + window.location.pathname;
+    const shareUrl = `${currentUrl}?room=${gameState.roomCode}`;
     
-    // 生成二维码
-    const qrCodeContainer = document.createElement('div');
-    qrCodeContainer.id = 'qr-code';
-    qrCodeContainer.style.marginTop = '20px';
-    qrCodeContainer.style.textAlign = 'center';
+    // 创建分享信息容器
+    const shareContainer = document.createElement('div');
+    shareContainer.id = 'share-info';
+    shareContainer.style.marginTop = '20px';
+    shareContainer.style.textAlign = 'center';
+    shareContainer.style.padding = '15px';
+    shareContainer.style.backgroundColor = '#f5f5f5';
+    shareContainer.style.borderRadius = '8px';
     
-    const qrCodeTitle = document.createElement('p');
-    qrCodeTitle.textContent = '扫描二维码加入房间';
-    qrCodeContainer.appendChild(qrCodeTitle);
-    
-    const qrCodeImg = document.createElement('canvas');
-    qrCodeImg.id = 'qrcode';
-    qrCodeContainer.appendChild(qrCodeImg);
+    const shareTitle = document.createElement('p');
+    shareTitle.textContent = '邀请其他玩家加入房间';
+    shareTitle.style.fontWeight = 'bold';
+    shareContainer.appendChild(shareTitle);
     
     const roomCodeText = document.createElement('p');
     roomCodeText.textContent = `房间代码：${gameState.roomCode}`;
     roomCodeText.style.marginTop = '10px';
-    qrCodeContainer.appendChild(roomCodeText);
+    roomCodeText.style.fontSize = '18px';
+    shareContainer.appendChild(roomCodeText);
     
-    // 添加手动访问提示
+    // 添加手动访问链接
     const manualAccessText = document.createElement('p');
-    manualAccessText.textContent = `或在浏览器中输入：${shareUrl}`;
+    manualAccessText.textContent = '加入链接：';
     manualAccessText.style.marginTop = '10px';
     manualAccessText.style.fontSize = '14px';
-    manualAccessText.style.color = '#666';
-    qrCodeContainer.appendChild(manualAccessText);
+    shareContainer.appendChild(manualAccessText);
+    
+    const shareLink = document.createElement('a');
+    shareLink.href = shareUrl;
+    shareLink.textContent = shareUrl;
+    shareLink.target = '_blank';
+    shareLink.style.display = 'block';
+    shareLink.style.marginTop = '5px';
+    shareLink.style.fontSize = '14px';
+    shareLink.style.color = '#1976d2';
+    shareLink.style.wordBreak = 'break-all';
+    shareContainer.appendChild(shareLink);
+    
+    // 添加复制按钮
+    const copyButton = document.createElement('button');
+    copyButton.textContent = '复制链接';
+    copyButton.style.marginTop = '10px';
+    copyButton.style.padding = '5px 15px';
+    copyButton.style.backgroundColor = '#1976d2';
+    copyButton.style.color = 'white';
+    copyButton.style.border = 'none';
+    copyButton.style.borderRadius = '4px';
+    copyButton.style.cursor = 'pointer';
+    copyButton.addEventListener('click', () => {
+        navigator.clipboard.writeText(shareUrl).then(() => {
+            alert('链接已复制到剪贴板');
+        }).catch(err => {
+            console.error('复制失败:', err);
+            alert('复制失败，请手动复制链接');
+        });
+    });
+    shareContainer.appendChild(copyButton);
     
     // 插入到房间准备界面
     const gamePrepSection = document.getElementById('game-prep-section');
-    const existingQRCode = document.getElementById('qr-code');
-    if (existingQRCode) {
-        existingQRCode.remove();
+    const existingShareInfo = document.getElementById('share-info');
+    if (existingShareInfo) {
+        existingShareInfo.remove();
     }
-    gamePrepSection.appendChild(qrCodeContainer);
-    
-    // 生成二维码
-    QRCode.toCanvas(qrCodeImg, shareUrl, {
-        width: 200,
-        margin: 1
-    }, function (error) {
-        if (error) console.error(error);
-    });
+    gamePrepSection.appendChild(shareContainer);
     
     // 打印分享URL到控制台，方便调试
     console.log('分享URL:', shareUrl);
@@ -619,7 +641,7 @@ function init() {
             saveGameState();
             showSection('game-prep-section');
             updateRoomPlayerList();
-            generateQRCode();
+            generateShareInfo();
         } else {
             // 加入房间
             console.log('尝试加入房间，房间代码:', roomCode, '玩家名称:', playerName);
