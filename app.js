@@ -688,11 +688,6 @@ function init() {
         }
     });
     
-    // 一键投票按钮
-    document.getElementById('vote-button').addEventListener('click', () => {
-        alert('投票已发起，请线下进行投票');
-    });
-    
     // 更换词语按钮
     document.getElementById('change-word').addEventListener('click', () => {
         console.log('更换词语按钮被点击');
