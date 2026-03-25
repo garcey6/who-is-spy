@@ -72,23 +72,41 @@
             padding: 0;
             display: flex;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 15px;
+            justify-content: center;
         }
         .player-list li {
-            padding: 15px;
+            padding: 10px;
             border: 1px solid #ddd;
             border-radius: 10px;
             text-align: center;
-            width: 120px;
+            width: calc(25% - 12px);
+            min-width: 80px;
             background-color: #f9f9f9;
         }
+        @media (max-width: 768px) {
+            .player-list li {
+                width: calc(33.33% - 10px);
+            }
+        }
+        @media (max-width: 480px) {
+            .player-list li {
+                width: calc(50% - 7.5px);
+            }
+        }
         .player-avatar {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
-            margin: 0 auto 10px;
+            margin: 0 auto 8px;
             background-size: cover;
             background-position: center;
+        }
+        @media (max-width: 480px) {
+            .player-avatar {
+                width: 40px;
+                height: 40px;
+            }
         }
         .host-controls {
             background-color: #f0f8ff;
