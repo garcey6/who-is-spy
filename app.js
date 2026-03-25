@@ -625,13 +625,16 @@ function init() {
             // 这里只是模拟加入
             // 确保头像不重复
             const availableAvatars = [...gameState.avatars];
-            const hostAvatar = availableAvatars.splice(Math.floor(Math.random() * availableAvatars.length), 1)[0];
-            const randomAvatar = availableAvatars.splice(Math.floor(Math.random() * availableAvatars.length), 1)[0];
             
-            gameState.players = [
-                { name: '房主', isHost: true, avatar: hostAvatar },
-                { name: playerName, isHost: false, avatar: randomAvatar }
-            ];
+            // 模拟从服务器获取房间信息
+            // 实际项目中，这里应该从Firebase或其他服务器获取真实的玩家列表
+            const mockHost = { name: '房主', isHost: true, avatar: availableAvatars[0] };
+            const randomAvatar = availableAvatars[Math.floor(Math.random() * availableAvatars.length)];
+            const newPlayer = { name: playerName, isHost: false, avatar: randomAvatar };
+            
+            // 添加新玩家到列表
+            gameState.players = [mockHost, newPlayer];
+            
             saveGameState();
             showSection('game-section');
             updatePlayerList();
@@ -649,32 +652,24 @@ function init() {
             return;
         }
         
+        // 检查是否有足够的玩家
+        if (gameState.players.length < 2) {
+            alert('至少需要2名玩家才能开始游戏');
+            return;
+        }
+        
         // 随机选择词语对
         const randomIndex = Math.floor(Math.random() * gameState.wordPairs.length);
         gameState.currentWords = gameState.wordPairs[randomIndex];
         
-        // 分配词语和头像
+        // 分配词语
         gameState.playerWords = {};
-        const spyIndex = Math.floor(Math.random() * playerCount);
+        const spyIndex = Math.floor(Math.random() * gameState.players.length);
         
-        // 为所有玩家分配头像（不重复）
-        gameState.players = [];
-        // 复制头像列表
-        const availableAvatars = [...gameState.avatars];
-        
-        for (let i = 0; i < playerCount; i++) {
-            const playerName = i === 0 ? gameState.playerName : `玩家${i+1}`;
-            // 随机选择头像并从可用列表中移除
-            const randomIndex = Math.floor(Math.random() * availableAvatars.length);
-            const selectedAvatar = availableAvatars.splice(randomIndex, 1)[0];
-            
-            gameState.players.push({
-                name: playerName,
-                isHost: i === 0,
-                avatar: selectedAvatar
-            });
-            gameState.playerWords[playerName] = i === spyIndex ? gameState.currentWords.spy : gameState.currentWords.normal;
-        }
+        // 为实际加入的玩家分配词语
+        gameState.players.forEach((player, index) => {
+            gameState.playerWords[player.name] = index === spyIndex ? gameState.currentWords.spy : gameState.currentWords.normal;
+        });
         
         gameState.gameStarted = true;
         saveGameState();
