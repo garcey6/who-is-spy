@@ -84,6 +84,9 @@ function getRoomCodeFromUrl() {
     return roomCode;
 }
 
+// 轮询间隔（毫秒）
+const POLLING_INTERVAL = 1000;
+
 // 游戏状态管理
 const gameState = {
     roomCode: '',
@@ -577,19 +580,55 @@ function generateRoomCode() {
 
 // 从本地存储加载游戏状态
 function loadGameState() {
-    const savedState = localStorage.getItem('whoIsSpyGame');
-    if (savedState) {
-        const loadedState = JSON.parse(savedState);
-        // 保留预设词库和头像列表
-        loadedState.wordPairs = gameState.wordPairs;
-        loadedState.avatars = gameState.avatars;
-        Object.assign(gameState, loadedState);
+    if (gameState.roomCode) {
+        const savedState = localStorage.getItem(`whoIsSpyGame_${gameState.roomCode}`);
+        if (savedState) {
+            const loadedState = JSON.parse(savedState);
+            // 保留预设词库和头像列表
+            loadedState.wordPairs = gameState.wordPairs;
+            loadedState.avatars = gameState.avatars;
+            Object.assign(gameState, loadedState);
+        }
     }
 }
 
 // 保存游戏状态到本地存储
 function saveGameState() {
-    localStorage.setItem('whoIsSpyGame', JSON.stringify(gameState));
+    if (gameState.roomCode) {
+        localStorage.setItem(`whoIsSpyGame_${gameState.roomCode}`, JSON.stringify(gameState));
+    }
+}
+
+// 轮询函数，更新房间状态
+function startPolling() {
+    setInterval(() => {
+        if (gameState.roomCode) {
+            loadGameState();
+            if (gameState.gameStarted) {
+                updatePlayerList();
+                const playerWordElement = document.getElementById('player-word');
+                if (playerWordElement && gameState.playerWords[gameState.playerName]) {
+                    playerWordElement.textContent = gameState.playerWords[gameState.playerName];
+                }
+            } else {
+                updateRoomPlayerList();
+            }
+        }
+    }, POLLING_INTERVAL);
+}
+
+// 更新房间状态
+function updateRoomState() {
+    loadGameState();
+    if (gameState.gameStarted) {
+        updatePlayerList();
+        const playerWordElement = document.getElementById('player-word');
+        if (playerWordElement && gameState.playerWords[gameState.playerName]) {
+            playerWordElement.textContent = gameState.playerWords[gameState.playerName];
+        }
+    } else {
+        updateRoomPlayerList();
+    }
 }
 
 // 显示指定 section，隐藏其他
@@ -649,31 +688,53 @@ function init() {
             gameState.playerName = playerName;
             gameState.isHost = false;
             
-            // 这里简化处理，实际应该从服务器获取房间信息
-            // 这里只是模拟加入
-            // 确保头像不重复
-            const availableAvatars = [...gameState.avatars];
-            console.log('可用头像:', availableAvatars);
+            // 加载房间状态
+            loadGameState();
+            console.log('加载房间状态:', gameState);
             
-            // 模拟从服务器获取房间信息
-            // 实际项目中，这里应该从Firebase或其他服务器获取真实的玩家列表
-            const mockHost = { name: '房主', isHost: true, avatar: availableAvatars[0] };
-            const randomAvatar = availableAvatars[Math.floor(Math.random() * availableAvatars.length)];
-            const newPlayer = { name: playerName, isHost: false, avatar: randomAvatar };
+            // 检查房间是否存在
+            if (!gameState.players || gameState.players.length === 0) {
+                alert('房间不存在或已关闭');
+                return;
+            }
             
-            // 添加新玩家到列表
-            gameState.players = [mockHost, newPlayer];
+            // 检查玩家是否已在房间中
+            const isPlayerExists = gameState.players.some(player => player.name === playerName);
+            if (!isPlayerExists) {
+                // 为新玩家分配随机头像
+                const randomAvatar = gameState.avatars[Math.floor(Math.random() * gameState.avatars.length)];
+                const newPlayer = { name: playerName, isHost: false, avatar: randomAvatar };
+                
+                // 添加新玩家到列表
+                gameState.players.push(newPlayer);
+                console.log('添加新玩家:', newPlayer);
+                
+                // 保存更新后的房间状态
+                saveGameState();
+                console.log('游戏状态已保存');
+            }
+            
             console.log('玩家列表:', gameState.players);
             
-            saveGameState();
-            console.log('游戏状态已保存');
-            showSection('game-section');
-            console.log('已显示游戏界面');
-            updatePlayerList();
-            console.log('已更新玩家列表');
-            // 模拟获取词语
-            document.getElementById('player-word').textContent = '苹果';
-            console.log('已设置玩家词语');
+            if (gameState.gameStarted) {
+                showSection('game-section');
+                console.log('已显示游戏界面');
+                updatePlayerList();
+                console.log('已更新玩家列表');
+                // 设置玩家词语
+                if (gameState.playerWords[playerName]) {
+                    document.getElementById('player-word').textContent = gameState.playerWords[playerName];
+                    console.log('已设置玩家词语:', gameState.playerWords[playerName]);
+                } else {
+                    document.getElementById('player-word').textContent = '等待房主开始游戏';
+                    console.log('等待房主开始游戏');
+                }
+            } else {
+                showSection('game-prep-section');
+                console.log('已显示游戏准备界面');
+                updateRoomPlayerList();
+                console.log('已更新玩家列表');
+            }
         }
     });
     
@@ -772,8 +833,10 @@ function init() {
             console.log('退出房间按钮被点击');
             
             // 删除缓存
-            localStorage.removeItem('whoIsSpyGame');
-            console.log('缓存已删除');
+            if (gameState.roomCode) {
+                localStorage.removeItem(`whoIsSpyGame_${gameState.roomCode}`);
+                console.log('缓存已删除');
+            }
             
             // 重置游戏状态
             gameState.roomCode = '';
@@ -791,6 +854,9 @@ function init() {
     } else {
         console.log('退出房间按钮不存在');
     }
+    
+    // 启动轮询
+    startPolling();
 }
 
 // 更新房间成员列表
