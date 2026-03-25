@@ -735,6 +735,33 @@ function init() {
     } else {
         console.log('更换词语按钮不存在');
     }
+    
+    // 退出房间按钮 - 检查元素是否存在
+    const exitRoomButton = document.getElementById('exit-room');
+    if (exitRoomButton) {
+        exitRoomButton.addEventListener('click', () => {
+            console.log('退出房间按钮被点击');
+            
+            // 删除缓存
+            localStorage.removeItem('whoIsSpyGame');
+            console.log('缓存已删除');
+            
+            // 重置游戏状态
+            gameState.roomCode = '';
+            gameState.playerName = '';
+            gameState.isHost = false;
+            gameState.players = [];
+            gameState.currentWords = { normal: '', spy: '' };
+            gameState.playerWords = {};
+            gameState.gameStarted = false;
+            
+            // 跳转到房间创建/加入页面
+            showSection('room-section');
+            alert('已退出房间');
+        });
+    } else {
+        console.log('退出房间按钮不存在');
+    }
 }
 
 // 更新房间成员列表
