@@ -584,6 +584,9 @@ function loadGameState() {
         const savedState = localStorage.getItem(`whoIsSpyGame_${gameState.roomCode}`);
         if (savedState) {
             const loadedState = JSON.parse(savedState);
+            console.log('加载房间状态:', loadedState);
+            console.log('当前玩家词语:', loadedState.playerWords);
+            console.log('当前词语对:', loadedState.currentWords);
             // 保留预设词库和头像列表
             loadedState.wordPairs = gameState.wordPairs;
             loadedState.avatars = gameState.avatars;
@@ -766,18 +769,25 @@ function init() {
         // 随机选择词语对
         const randomIndex = Math.floor(Math.random() * gameState.wordPairs.length);
         gameState.currentWords = gameState.wordPairs[randomIndex];
+        console.log('选择的词语对:', gameState.currentWords);
         
         // 分配词语
         gameState.playerWords = {};
         const spyIndex = Math.floor(Math.random() * gameState.players.length);
+        console.log('卧底索引:', spyIndex, '卧底玩家:', gameState.players[spyIndex].name);
         
         // 为实际加入的玩家分配词语
         gameState.players.forEach((player, index) => {
-            gameState.playerWords[player.name] = index === spyIndex ? gameState.currentWords.spy : gameState.currentWords.normal;
+            const isSpy = index === spyIndex;
+            gameState.playerWords[player.name] = isSpy ? gameState.currentWords.spy : gameState.currentWords.normal;
+            console.log(`玩家 ${player.name} 的词语: ${gameState.playerWords[player.name]} ${isSpy ? '(卧底)' : ''}`);
         });
+        
+        console.log('所有玩家词语:', gameState.playerWords);
         
         gameState.gameStarted = true;
         saveGameState();
+        console.log('游戏状态已保存');
         showSection('game-section');
         updatePlayerList();
         document.getElementById('player-word').textContent = gameState.playerWords[gameState.playerName];
@@ -890,6 +900,20 @@ function updateRoomPlayerList() {
 // 更新玩家列表
 function updatePlayerList() {
     const playerList = document.getElementById('player-list');
+    
+    // 检查玩家列表是否已经存在，如果存在则只更新内容不重新创建
+    if (playerList.children.length === gameState.players.length) {
+        // 只更新玩家名称和标记
+        Array.from(playerList.children).forEach((li, index) => {
+            const player = gameState.players[index];
+            const nameSpan = li.querySelector('div:last-child');
+            if (nameSpan) {
+                nameSpan.textContent = player.name + (player.isHost ? ' (房主)' : '');
+            }
+        });
+        return;
+    }
+    
     playerList.innerHTML = '';
     
     gameState.players.forEach(player => {
@@ -902,6 +926,8 @@ function updatePlayerList() {
         if (gameState.isHost) {
             avatarDiv.style.cursor = 'pointer';
             avatarDiv.addEventListener('click', () => {
+                // 重新加载最新状态
+                loadGameState();
                 const playerWord = gameState.playerWords[player.name];
                 const isSpy = playerWord === gameState.currentWords.spy;
                 alert(`${player.name}的词语是：${playerWord}\n${isSpy ? '他是卧底！' : '他不是卧底'}`);
