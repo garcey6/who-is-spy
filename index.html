@@ -173,7 +173,10 @@
         
         <!-- 游戏界面 -->
         <div id="game-section" class="hidden">
-            <h2>游戏中</h2>
+            <div style="position: relative;">
+                <h2>游戏中</h2>
+                <button id="exit-room" style="position: absolute; top: 0; right: 0; background-color: #f44336;">退出房间</button>
+            </div>
             <div class="word-display" id="word-display">
                 你的词：<span id="player-word">加载中...</span>
             </div>
@@ -181,9 +184,6 @@
                 <h3>房主控制</h3>
                 <p>点击玩家头像查看词语和身份</p>
                 <button id="change-word">更换词语</button>
-            </div>
-            <div class="button-group" style="margin-top: 20px;">
-                <button id="exit-room" style="background-color: #f44336;">退出房间</button>
             </div>
             <div class="player-list" id="player-list">
                 <!-- 玩家列表将在这里动态生成 -->
